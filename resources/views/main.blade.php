@@ -8,81 +8,105 @@
         <v-app>
             <v-main>
 
+                <!--NEW CODE-->
+                <v-card>
+                    <v-container>
+                        <h5 class="ps-5 mb-2"><b>Фильтрация данных</b></h5>
+                        <v-row>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                    label="Дата торгов от"
+                                    outlined
+                                    dense
+                                    v-model = "date_torg_min"
+                                    clearable
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
 
-                <v-row>
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            label="От"
-                            outlined
-                            dense
-                        ></v-text-field>
-                    </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                    label="Максимальная цена от"
+                                    outlined
+                                    dense
+                                    v-model = "price_min"
+                                    clearable
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
 
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            label="До"
-                            outlined
-                            dense
-                        ></v-text-field>
-                    </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                    label="Кол-во продаж от"
+                                    outlined
+                                    dense
+                                    v-model = "numb_sales_min"
+                                    clearable
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
 
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            label="Outlined"
-                            outlined
-                            dense
-                        ></v-text-field>
-                    </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                    label="Дата торгов до"
+                                    outlined
+                                    dense
+                                    v-model = "date_torg_max"
+                                    clearable
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
 
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            label="Outlined"
-                            outlined
-                            dense
-                        ></v-text-field>
-                    </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                    label="Максимальная цена до"
+                                    outlined
+                                    dense
+                                    v-model = "price_max"
+                                    clearable
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
 
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            label="Outlined"
-                            outlined
-                            dense
-                        ></v-text-field>
-                    </v-col>
-
-                    <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                    >
-                        <v-text-field
-                            label="Outlined"
-                            outlined
-                            dense
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                    label="Кол-во продаж до"
+                                    outlined
+                                    dense
+                                    v-model = "numb_sales_max"
+                                    clearable
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-card>
+                <v-divider></v-divider>
+                <!--NEW CODE-->
 
 
                 <v-card>
@@ -515,6 +539,17 @@
             vuetify: new Vuetify(),
             data(){
                 return{
+
+                    <!--NEW CODE-->
+                    date_torg_min:'',
+                    price_min:'',
+                    numb_sales_min:'',
+                    date_torg_max:'',
+                    price_max:'',
+                    numb_sales_max:'',
+                    <!--NEW CODE-->
+
+
                     //selected:[],
                     //show_tables_info_:[],
                     answer:[],
@@ -558,6 +593,30 @@
                 }
             },
             methods:{
+                <!--NEW CODE-->
+                ShowFilteredTable(){
+                    this.show_tables_info = this.show_tables_info_original
+                    if (this.date_torg_min){
+                        this.show_tables_info = this.show_tables_info.filter(data => data.torg_date >= this.date_torg_min)
+                    }
+                    if (this.date_torg_max){
+                        this.show_tables_info = this.show_tables_info.filter(data => data.torg_date <= this.date_torg_max)
+                    }
+                    if (this.price_min){
+                        this.show_tables_info = this.show_tables_info.filter(data => Number(data.quotation) >= Number(this.price_min))
+                    }
+                    if (this.price_max){
+                        this.show_tables_info = this.show_tables_info.filter(data => Number(data.quotation) <= Number(this.price_max))
+                    }
+                    if (this.numb_sales_min){
+                        this.show_tables_info = this.show_tables_info.filter(data => Number(data.num_contr) >= Number(this.numb_sales_min))
+                    }
+                    if (this.numb_sales_max){
+                        this.show_tables_info = this.show_tables_info.filter(data => Number(data.num_contr) <= Number(this.numb_sales_max))
+                    }
+                },
+                <!--NEW CODE-->
+
                 //<!--NEW CODE-->
                 showStatsFun(){
                     this.Stats = []

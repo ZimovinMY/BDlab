@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class MainController extends Controller
 {
@@ -67,6 +70,35 @@ class MainController extends Controller
         DB::insert('insert into dataisp (kod,exec_data)
         values(?,?)',
             [$K,$ED]);
+    }
+    public function ExportData(Request $request){
+        $kod=$request->input('kod');
+        $exec_data=$request->input('exec_data');
+        $torg_date=$request->input('torg_date');
+        $quotation=$request->input('quotation');
+        $num_contr=$request->input('num_contr');
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'Код фьючерса');
+        $sheet->setCellValue('B1', 'Дата погашения');
+        $sheet->setCellValue('C1', 'Дата торгов');
+        $sheet->setCellValue('D1', 'Максимальная цена');
+        $sheet->setCellValue('E1', 'Кол-во продаж');
+        //var_dump(count($kod))+2//
+        for($step = 2; $step < 2000; $step ++){
+            $sheet->setCellValue('A'.$step, $kod[$step-2]);
+            $sheet->setCellValue('B'.$step, $exec_data[$step-2]);
+            $sheet->setCellValue('C'.$step, $torg_date[$step-2]);
+            $sheet->setCellValue('D'.$step, $quotation[$step-2]);
+            $sheet->setCellValue('E'.$step, $num_contr[$step-2]);
+        }
+        $filename = 'output_data-'.time().'.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
     }
 }
 

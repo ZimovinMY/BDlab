@@ -117,12 +117,17 @@
                             class="elevation-1"
                             :search="search">
                             <template v-slot:top>
-                                <v-text-field
-                                    v-model="search"
-                                    label="Поиск"
-                                    class="mx-4"
+                                <br>
+                                <v-btn
+                                    class="mx-5"
+                                    color="primary"
+                                    outlined
+                                    @click="ExportData"
                                 >
-                                </v-text-field>
+                                    Экспортировать таблицу в файл
+                                </v-btn>
+                                <br>
+                                <br>
                             </template>
                             <template
                                 v-slot:item._actions="{ item }">
@@ -593,6 +598,24 @@
                 }
             },
             methods:{
+                ExportData(){
+                    let data = new FormData()
+                    let kod = this.show_tables_info.map(({ kod }) => kod);
+                    let exec_data = this.show_tables_info.map(({ exec_data }) => exec_data);
+                    let torg_date = this.show_tables_info.map(({ torg_date }) => torg_date);
+                    let quotation = this.show_tables_info.map(({ quotation }) => quotation);
+                    let num_contr = this.show_tables_info.map(({ num_contr }) => num_contr);
+                    data.append('kod',kod)
+                    data.append('exec_data',exec_data)
+                    data.append('torg_date',torg_date)
+                    data.append('quotation',quotation)
+                    data.append('num_contr',num_contr)
+                    fetch('ExportData',{
+                        method:'POST',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        body:data
+                    })
+                },
                 <!--NEW CODE-->
                 ShowFilteredTable(){
                     this.show_tables_info = this.show_tables_info_original

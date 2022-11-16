@@ -122,7 +122,7 @@
                                     class="mx-5"
                                     color="primary"
                                     outlined
-                                    @click="ExportData"
+                                    @click="ExportReport"
                                 >
                                     Экспортировать таблицу в файл
                                 </v-btn>
@@ -585,6 +585,7 @@
                         { text: 'Дата торгов', value: 'torg_date' },
                         { text: 'Максимальная цена', value: 'quotation' },
                         { text: 'Кол-во продаж', value: 'num_contr' },
+                        { text: 'Xk', value: 'Xk' },
                         { text: 'Изменить/удалить', value: '_actions'},
                     ],
                     headersStats: [
@@ -598,23 +599,24 @@
                 }
             },
             methods:{
-                ExportData(){
-                    let data = new FormData()
-                    let kod = this.show_tables_info.map(({ kod }) => kod);
-                    let exec_data = this.show_tables_info.map(({ exec_data }) => exec_data);
-                    let torg_date = this.show_tables_info.map(({ torg_date }) => torg_date);
-                    let quotation = this.show_tables_info.map(({ quotation }) => quotation);
-                    let num_contr = this.show_tables_info.map(({ num_contr }) => num_contr);
-                    data.append('kod',kod)
-                    data.append('exec_data',exec_data)
-                    data.append('torg_date',torg_date)
-                    data.append('quotation',quotation)
-                    data.append('num_contr',num_contr)
-                    fetch('ExportData',{
-                        method:'POST',
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                async ExportReport(){
+                    let data=new FormData()
+                    data.append('date_torg_min',this.date_torg_min)
+                    data.append('date_torg_max',this.date_torg_max)
+                    data.append('price_min',this.price_min)
+                    data.append('price_max',this.price_max)
+                    data.append('numb_sales_min',this.numb_sales_min)
+                    data.append('numb_sales_max',this.numb_sales_max)
+                    await fetch('ExportReport',{
+                        method:'post',
+                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         body:data
                     })
+                    this.GetDownload()
+                },
+                GetDownload(){
+                    let url = new URL(window.location);
+                    location = "{{route('GetDownload')}}"
                 },
                 <!--NEW CODE-->
                 ShowFilteredTable(){
@@ -682,9 +684,9 @@
                     //Тут можно много чего оптимизировать
                     for (let key in groupByFUSD_t) {
                         //console.log(key, groupByFUSD_t[key]);
-                        let average = groupByFUSD_t[key].reduce((total, next) => total + parseFloat(next.quotation), 0) / groupByFUSD_t[key].length;
+                        let average = groupByFUSD_t[key].reduce((total, next) => total + parseFloat(next.Xk), 0) / groupByFUSD_t[key].length;
 
-                        let diff = groupByFUSD_t[key].reduce((total, next) => total + (parseFloat(next.quotation) - average)*(parseFloat(next.quotation) - average), 0) / (groupByFUSD_t[key].length-1);
+                        let diff = groupByFUSD_t[key].reduce((total, next) => total + (parseFloat(next.Xk) - average)*(parseFloat(next.Xk) - average), 0) / (groupByFUSD_t[key].length-1);
 
 
                         //Получение минимума для данного фьючерса
@@ -705,10 +707,10 @@
 
                         //Расчёт размаха max - min
                         d = parseFloat(groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.quotation < curr.quotation ? curr : prev;
-                        }).quotation) - parseFloat(groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.quotation < curr.quotation ? prev : curr;
-                        }).quotation)
+                            return prev.Xk < curr.Xk ? curr : prev;
+                        }).Xk) - parseFloat(groupByFUSD_t[key].reduce(function(prev, curr) {
+                            return prev.Xk < curr.Xk ? prev : curr;
+                        }).Xk)
 
                         //console.log('d',d)
                         //Добавление размаха
@@ -726,8 +728,8 @@
                         //console.log(key, groupByFUSD_t_0[key]);
                         //console.log(key, groupByFUSD_t_0[key]);
                         temp_FUSD.push(key)
-                        let average = groupByFUSD_t_0[key].reduce((total, next) => total + parseFloat(next.quotation), 0) / groupByFUSD_t_0[key].length;
-                        let diff = groupByFUSD_t_0[key].reduce((total, next) => total + (parseFloat(next.quotation) - average)*(parseFloat(next.quotation) - average), 0) / (groupByFUSD_t_0[key].length-1);
+                        let average = groupByFUSD_t_0[key].reduce((total, next) => total + parseFloat(next.Xk), 0) / groupByFUSD_t_0[key].length;
+                        let diff = groupByFUSD_t_0[key].reduce((total, next) => total + (parseFloat(next.Xk) - average)*(parseFloat(next.Xk) - average), 0) / (groupByFUSD_t_0[key].length-1);
 
                         //let sum = (prev, cur) => ({height: prev.height + cur.height});
                         //let avg = arr.reduce(sum).height / arr.length;
@@ -751,11 +753,11 @@
                         //console.log("temp_diff_all",temp_diff_t[i] - temp_diff_t_0[i])
                         let props = [
                             ['FUSD', temp_FUSD[i]],
-                            ['Mx', Number(temp_average_t[i]).toFixed(3)],
-                            ['D', Number(temp_diff_t[i]).toFixed(3)],
-                            ['V', Number(temp_d_t[i]).toFixed(3)],
-                            ['TrendMx', Number(temp_average_t[i] - temp_average_t_0[i]).toFixed(3)],
-                            ['TrendD', Number(temp_diff_t[i] - temp_diff_t_0[i]).toFixed(3)],
+                            ['Mx', Number(temp_average_t[i]).toFixed(6)],
+                            ['D', Number(temp_diff_t[i]).toFixed(6)],
+                            ['V', Number(temp_d_t[i]).toFixed(6)],
+                            ['TrendMx', Number(temp_average_t[i] - temp_average_t_0[i]).toFixed(6)],
+                            ['TrendD', Number(temp_diff_t[i] - temp_diff_t_0[i]).toFixed(6)],
                         ]
 
                         this.Stats.push(Object.fromEntries(props))

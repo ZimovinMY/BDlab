@@ -20,4 +20,6 @@ Route::post('/DeleteData','MainController@DeleteData','DeleteData');
 Route::post('/AddData','MainController@AddData','AddData');
 Route::post('/AddDataF','MainController@AddDataF','AddDataF');
 Route::post('/KodCheck','MainController@KodCheck','KodCheck');
-Route::post('/ExportData','MainController@ExportData','ExportData');
+
+Route::post('/ExportReport','MainController@ExportReport','ExportReport');
+Route::get('/GetDownload', 'MainController@GetDownload')->name('GetDownload');;

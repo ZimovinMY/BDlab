@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Response;
 
 class MainController extends Controller
 {
@@ -14,12 +17,21 @@ class MainController extends Controller
     }
 
     public function ShowUnitedTable(){/*функция получения данных из 2х таблц*/
-        $query = DB::select("SELECT
-        torg_date, F_usd.kod, REPLACE(quotation, ',', '.') as quotation, num_contr, exec_data
+        $query = DB::select("
+        select torg_date,kod,REPLACE(quotation, ',', '.') as quotation,num_contr,exec_data,
+               REPLACE(ISNULL(LOG(quotation/EndDate),0), ',', '.') as Xk
+        from(
+
+        select torg_date,F_usd.kod,quotation,num_contr,exec_data, Lag(CAST(quotation AS float), 2)
+        OVER(PARTITION BY F_usd.kod ORDER BY torg_date ASC) AS EndDate
         FROM F_usd
-        INNER JOIN dataisp ON dataisp.kod = F_usd.kod");
+        inner join dataisp on dataisp.kod = F_usd.kod
+
+        where CAST(quotation AS float) > 0
+        ) as temp");
         return json_encode($query);
     }
+
     public function KodCheck(Request $request){/*функция проверки существования кода*/
         $request->input('kod');
         $count=DB::select("SELECT Count(*)
@@ -71,34 +83,96 @@ class MainController extends Controller
         values(?,?)',
             [$K,$ED]);
     }
-    public function ExportData(Request $request){
-        $kod=$request->input('kod');
-        $exec_data=$request->input('exec_data');
-        $torg_date=$request->input('torg_date');
-        $quotation=$request->input('quotation');
-        $num_contr=$request->input('num_contr');
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A1', 'Код фьючерса');
-        $sheet->setCellValue('B1', 'Дата погашения');
-        $sheet->setCellValue('C1', 'Дата торгов');
-        $sheet->setCellValue('D1', 'Максимальная цена');
-        $sheet->setCellValue('E1', 'Кол-во продаж');
-        //var_dump(count($kod))+2//
-        for($step = 2; $step < 2000; $step ++){
-            $sheet->setCellValue('A'.$step, $kod[$step-2]);
-            $sheet->setCellValue('B'.$step, $exec_data[$step-2]);
-            $sheet->setCellValue('C'.$step, $torg_date[$step-2]);
-            $sheet->setCellValue('D'.$step, $quotation[$step-2]);
-            $sheet->setCellValue('E'.$step, $num_contr[$step-2]);
-        }
-        $filename = 'output_data-'.time().'.xlsx';
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
+    public function ExportReport(Request $request)
+    {
+        $date_torg_min = $request->input('date_torg_min');
+        $date_torg_max = $request->input('date_torg_max');
+        $price_min = $request->input('price_min');
+        $price_max = $request->input('price_max');
+        $numb_sales_min = $request->input('numb_sales_min');
+        $numb_sales_max = $request->input('numb_sales_max');
+        $query = DB::select("
+        select MAX(quotation) AS MAX_quotation, MIN(quotation) AS MIN_quotation,MAX(num_contr) AS MAX_num_contr, MIN(num_contr) AS MIN_num_contr,MAX(torg_date) AS MAX_torg_date, MIN(torg_date) AS MIN_torg_date  FROM(
+        select torg_date,kod,REPLACE(quotation, ',', '.') as quotation,num_contr,exec_data,
+               REPLACE(LOG(quotation/EndDate), ',', '.') as Xk
+        from(
 
-        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save('php://output');
+        select torg_date,F_usd.kod,quotation,num_contr,exec_data, Lag(CAST(quotation AS float), 2)
+        OVER(PARTITION BY F_usd.kod ORDER BY torg_date ASC) AS EndDate
+        FROM F_usd
+        inner join dataisp on dataisp.kod = F_usd.kod
+
+        where CAST(quotation AS float) > 0
+        ) as temp
+        ) AS SSS
+        ");
+        if ($date_torg_min == ''){
+            $date_torg_min = $query[0]->MIN_torg_date;
+        }
+        if ($date_torg_max == ''){
+            $date_torg_max = $query[0]->MAX_torg_date;
+        }
+        if ($price_min == ''){
+            $price_min = $query[0]->MIN_quotation;
+        }
+        if ($price_max == ''){
+            $price_max = $query[0]->MAX_quotation;
+        }
+        if ($numb_sales_min == ''){
+            $numb_sales_min = $query[0]->MIN_num_contr;
+        }
+        if ($numb_sales_max == ''){
+            $numb_sales_max = $query[0]->MAX_num_contr;
+        }
+        $data = DB::select("
+        select torg_date,kod,REPLACE(quotation, ',', '.') as quotation,num_contr,exec_data,
+               REPLACE(LOG(quotation/EndDate), ',', '.') as Xk
+        from(
+
+        select torg_date,F_usd.kod,quotation,num_contr,exec_data, Lag(CAST(quotation AS float), 2)
+        OVER(PARTITION BY F_usd.kod ORDER BY torg_date ASC) AS EndDate
+        FROM F_usd
+        inner join dataisp on dataisp.kod = F_usd.kod
+
+        where CAST(quotation AS float) > 0
+        ) as temp
+        where torg_date >= '$date_torg_min' and torg_date <= '$date_torg_max' and quotation >= '$price_min' and quotation <= '$price_max' and num_contr >= '$numb_sales_min' and num_contr <= '$numb_sales_max'
+        ");
+        $data_array [] = array("Код фьючерса", "Дата погашения", "Дата торгов", "Максимальная цена", "Кол-во продаж", "Xk");
+        foreach ($data as $data_item) {
+            $data_array[] = array(
+                'Код фьючерса' => $data_item->kod,
+                'Дата погашения' => $data_item->exec_data,
+                'Дата торгов' => $data_item->torg_date,
+                'Максимальная цена' => $data_item->quotation,
+                'Кол-во продаж' => $data_item->num_contr,
+                'Xk' => $data_item->Xk
+            );
+        }
+        $this->ExportFunction($data_array);
+    }
+
+    public function ExportFunction($export_array){
+        $spreadSheet = new Spreadsheet();
+        $spreadSheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(20);
+        $spreadSheet->getActiveSheet()->fromArray($export_array);
+
+        $Excel_writer = new Xls($spreadSheet);
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="ExportedData.xls"');
+        header('Cache-Control: max-age=0');
+        $Excel_writer->save('ExportedData.xls');
+    }
+
+    public function GetDownload()
+    {
+        //PDF file is stored under project/public/download/info.pdf
+        $file= public_path(). "/ExportedData.xls";
+
+        $headers = array(
+            'Content-Type: application/xls',
+        );
+        return Response::download($file, 'ExportedData.xls', $headers);
     }
 }
 

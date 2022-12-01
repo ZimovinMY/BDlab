@@ -9,14 +9,30 @@
             <v-main>
 
                 <!--NEW CODE-->
-                <v-card>
+                <v-card max-width="700">
                     <v-container>
                         <h5 class="ps-5 mb-2"><b>Фильтрация данных</b></h5>
                         <v-row>
                             <v-col
                                 cols="12"
                                 sm="6"
-                                md="4"
+                            >
+                                <v-text-field
+                                    label="Код фьючерса"
+                                    outlined
+                                    dense
+                                    v-model = "kod_fut"
+                                    clearable
+                                    hide-details
+                                    class="ma-0 pa-0"
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col
+                                cols="12"
+                                sm="6"
                             >
                                 <v-text-field
                                     label="Дата торгов от"
@@ -24,6 +40,8 @@
                                     dense
                                     v-model = "date_torg_min"
                                     clearable
+                                    hide-details
+                                    class="ma-0 pa-0"
                                     @change="ShowFilteredTable"
                                 ></v-text-field>
                             </v-col>
@@ -31,37 +49,6 @@
                             <v-col
                                 cols="12"
                                 sm="6"
-                                md="4"
-                            >
-                                <v-text-field
-                                    label="Максимальная цена от"
-                                    outlined
-                                    dense
-                                    v-model = "price_min"
-                                    clearable
-                                    @change="ShowFilteredTable"
-                                ></v-text-field>
-                            </v-col>
-
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
-                                <v-text-field
-                                    label="Кол-во продаж от"
-                                    outlined
-                                    dense
-                                    v-model = "numb_sales_min"
-                                    clearable
-                                    @change="ShowFilteredTable"
-                                ></v-text-field>
-                            </v-col>
-
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
                             >
                                 <v-text-field
                                     label="Дата торгов до"
@@ -69,6 +56,25 @@
                                     dense
                                     v-model = "date_torg_max"
                                     clearable
+                                    hide-details
+                                    class="ma-0 pa-0"
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                            >
+                                <v-text-field
+                                    label="Максимальная цена от"
+                                    outlined
+                                    dense
+                                    v-model = "price_min"
+                                    clearable
+                                    hide-details
+                                    class="ma-0 pa-0"
                                     @change="ShowFilteredTable"
                                 ></v-text-field>
                             </v-col>
@@ -76,7 +82,6 @@
                             <v-col
                                 cols="12"
                                 sm="6"
-                                md="4"
                             >
                                 <v-text-field
                                     label="Максимальная цена до"
@@ -84,6 +89,26 @@
                                     dense
                                     v-model = "price_max"
                                     clearable
+                                    hide-details
+                                    class="ma-0 pa-0"
+                                    @change="ShowFilteredTable"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                            >
+                                <v-text-field
+                                    label="Кол-во продаж от"
+                                    outlined
+                                    dense
+                                    v-model = "numb_sales_min"
+                                    clearable
+                                    hide-details
+                                    class="ma-0 pa-0"
                                     @change="ShowFilteredTable"
                                 ></v-text-field>
                             </v-col>
@@ -91,7 +116,6 @@
                             <v-col
                                 cols="12"
                                 sm="6"
-                                md="4"
                             >
                                 <v-text-field
                                     label="Кол-во продаж до"
@@ -99,10 +123,21 @@
                                     dense
                                     v-model = "numb_sales_max"
                                     clearable
+                                    hide-details
+                                    class="ma-0 pa-0"
                                     @change="ShowFilteredTable"
                                 ></v-text-field>
                             </v-col>
                         </v-row>
+                        <v-btn
+                            color="red darken-1"
+                            small
+                            outlined
+                            @click="ResetTable"
+                            class="mt-5 ml-2 mb-1"
+                        >
+                            Сбросить фильтры
+                        </v-btn>
                     </v-container>
                 </v-card>
                 <v-divider></v-divider>
@@ -122,6 +157,7 @@
                                     class="mx-5"
                                     color="primary"
                                     outlined
+                                    small
                                     @click="ExportReport"
                                 >
                                     Экспортировать таблицу в файл
@@ -502,14 +538,39 @@
                             class="elevation-1"
                             :search="search">
                             <template v-slot:top>
-                                <v-text-field
-                                    v-model="search"
-                                    label="Поиск"
-                                    class="mx-4"
+                                <br>
+                                <v-btn
+                                    class="mx-5"
+                                    color="primary"
+                                    outlined
+                                    small
+                                    @click="ExportReportStats"
                                 >
-                                </v-text-field>
+                                    Экспортировать таблицу в файл
+                                </v-btn>
+                                <br>
+                                <br>
+                            </template>
+                            <template v-slot:item="i">
+                                <!-- Since v-slot:item overrides how each row is rendered, I rebuild the row starting from <tr>. This allows me to add a class to <tr> based on any condition I want (in this case, the calorie count) -->
+                                <tr>
+                                    <td>@{{i.item.FUSD}}</td>
+                                    <td>@{{i.item.Mx}}</td>
+                                    <td>@{{i.item.D}}</td>
+                                    <td>@{{i.item.V}}</td>
+                                    <td :class="{
+                      'green lighten-2': i.item.TrendMx > 0,
+                      'red lighten-4': i.item.TrendMx < 0
+                      }">               @{{i.item.TrendMx}}</td>
+                                    <td :class="{
+                      'green lighten-2': i.item.TrendD > 0,
+                      'red lighten-4': i.item.TrendD < 0
+                      }">               @{{i.item.TrendD}}</td>
+                                </tr>
                             </template>
                         </v-data-table>
+
+
 
 
                         <v-btn
@@ -546,6 +607,7 @@
                 return{
 
                     <!--NEW CODE-->
+                    kod_fut:'',
                     date_torg_min:'',
                     price_min:'',
                     numb_sales_min:'',
@@ -599,8 +661,32 @@
                 }
             },
             methods:{
+                async ExportReportStats(){
+                    let data=new FormData()
+                    let FUSD = this.Stats.map(({ FUSD }) => FUSD)
+                    let Mx = this.Stats.map(({ Mx }) => Mx)
+                    let D = this.Stats.map(({ D }) => D)
+                    let V = this.Stats.map(({ V }) => V)
+                    let TrendMx = this.Stats.map(({ TrendMx }) => TrendMx)
+                    let TrendD = this.Stats.map(({ TrendD }) => TrendD)
+                    data.append('FUSD',FUSD)
+                    data.append('Mx',Mx)
+                    data.append('D',D)
+                    data.append('V',V)
+                    data.append('TrendMx',TrendMx)
+                    data.append('TrendD',TrendD)
+                    data.append('Date1',this.Date_1)
+                    data.append('Date2',this.Date_2)
+                    await fetch('ExportReportStats',{
+                        method:'post',
+                        headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        body:data
+                    })
+                    this.GetDownloadStats()
+                },
                 async ExportReport(){
                     let data=new FormData()
+                    data.append('kod',this.kod_fut)
                     data.append('date_torg_min',this.date_torg_min)
                     data.append('date_torg_max',this.date_torg_max)
                     data.append('price_min',this.price_min)
@@ -614,6 +700,10 @@
                     })
                     this.GetDownload()
                 },
+                GetDownloadStats(){
+                    let url = new URL(window.location);
+                    location = "{{route('GetDownloadStats')}}"
+                },
                 GetDownload(){
                     let url = new URL(window.location);
                     location = "{{route('GetDownload')}}"
@@ -621,6 +711,9 @@
                 <!--NEW CODE-->
                 ShowFilteredTable(){
                     this.show_tables_info = this.show_tables_info_original
+                    if (this.kod_fut){
+                        this.show_tables_info = this.show_tables_info.filter(data => data.kod == this.kod_fut)
+                    }
                     if (this.date_torg_min){
                         this.show_tables_info = this.show_tables_info.filter(data => data.torg_date >= this.date_torg_min)
                     }
@@ -639,6 +732,17 @@
                     if (this.numb_sales_max){
                         this.show_tables_info = this.show_tables_info.filter(data => Number(data.num_contr) <= Number(this.numb_sales_max))
                     }
+                },
+
+                ResetTable(){
+                    this.show_tables_info = this.show_tables_info_original
+                    this.kod_fut='',
+                    this.date_torg_min='',
+                    this.price_min='',
+                    this.numb_sales_min='',
+                    this.date_torg_max='',
+                    this.price_max='',
+                    this.numb_sales_max=''
                 },
                 <!--NEW CODE-->
 

@@ -19,7 +19,7 @@
                                     sm="6"
                                 >
                                     <v-text-field
-                                        :rules="kod_rules"
+                                        :rules="kod_rules_filter"
                                         label="Код фьючерса"
                                         outlined
                                         dense
@@ -36,7 +36,7 @@
                                     sm="6"
                                 >
                                     <v-text-field
-                                        :rules="date_rules"
+                                        :rules="date_rules_filter"
                                         label="Дата торгов от"
                                         outlined
                                         dense
@@ -52,7 +52,7 @@
                                     sm="6"
                                 >
                                     <v-text-field
-                                        :rules="date_rules"
+                                        :rules="date_rules_filter"
                                         label="Дата торгов до"
                                         outlined
                                         dense
@@ -69,7 +69,7 @@
                                     sm="6"
                                 >
                                     <v-text-field
-                                        :rules="price_rules"
+                                        :rules="price_rules_filter"
                                         label="Максимальная цена от"
                                         outlined
                                         dense
@@ -85,7 +85,7 @@
                                     sm="6"
                                 >
                                     <v-text-field
-                                        :rules="price_rules"
+                                        :rules="price_rules_filter"
                                         label="Максимальная цена до"
                                         outlined
                                         dense
@@ -103,7 +103,7 @@
                                     sm="6"
                                 >
                                     <v-text-field
-                                        :rules="sale_rules"
+                                        :rules="sale_rules_filter"
                                         label="Кол-во продаж от"
                                         outlined
                                         dense
@@ -119,7 +119,7 @@
                                     sm="6"
                                 >
                                     <v-text-field
-                                        :rules="sale_rules"
+                                        :rules="sale_rules_filter"
                                         label="Кол-во продаж до"
                                         outlined
                                         dense
@@ -212,40 +212,46 @@
                     </v-card-actions>
 
                     <!--NEW CODE-->
-                    <v-text-field
-                        v-model="Date_1"
-                        label="Поиск от"
-                        class="mx-4"
-                    ></v-text-field>
-                    <v-text-field
-                        v-model="Date_2"
-                        label="Поиск до"
-                        class="mx-4"
-                    ></v-text-field>
+                    <v-form ref="form4">
+                        <v-text-field
+                            :rules="date_rules"
+                            outlined
+                            dense
+                            clearable
+                            v-model="Date_1"
+                            label="Поиск от"
+                            class="mx-4"
+                        ></v-text-field>
+                        <v-text-field
+                            :rules="date_rules"
+                            outlined
+                            dense
+                            clearable
+                            v-model="Date_2"
+                            label="Поиск до"
+                            class="mx-4"
+                        ></v-text-field>
 
-                    <v-btn
-                        color="primary"
-                        text
-                        @click="filterTable()"
-                    >Отфильтровать
-                    </v-btn>
-                    <v-btn
-                        color="primary"
-                        text
-                        @click="showStats = true"
-                    >Расчитать статистические характеристики</v-btn>
+                        <v-btn
+                            color="primary"
+                            text
+                            @click="showStatsFun() "
+
+                        >Расчитать статистические характеристики
+                        </v-btn>
+                    </v-form>
                     <!--NEW CODE-->
 
                 </v-card>
             </v-main>
 
             <v-dialog
-            v-model="dialog_change"
-            width="400"
+                v-model="dialog_change"
+                width="400"
             >
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Изменение данных
+                        Изменение данных
                     </v-card-title>
                     <v-divider></v-divider>
                     <v-card-actions>
@@ -384,8 +390,8 @@
                     <v-card-title class="text-h5 grey lighten-2">
                         Добавление данных
                     </v-card-title>
-                        <v-form ref="form3">
-                            <v-container>
+                    <v-form ref="form3">
+                        <v-container>
                             <v-row>
                                 <v-col
                                     cols="12"
@@ -400,62 +406,62 @@
 
                                 </v-col>
                             </v-row>
-                            </v-container>
-                            <v-col
-                                cols="auto"
-                                sm="10"
-                            >
-                                <v-text-field
-                                    :rules="date_rules"
-                                    v-model="Torg_date"
-                                    label="Дата торгов"
-                                    class="mx4"
-                                >
-
-                                </v-text-field>
-                            </v-col>
-                            <v-col
-                                cols="auto"
-                                sm="10"
-                            >
-                                <v-text-field
-                                    :rules="price_rules"
-                                    v-model="Quotation"
-                                    label="Максимальная цена"
-                                    class="mx4">
-
-                                </v-text-field>
-                            </v-col>
-                            <v-col
-                                cols="auto"
-                                sm="10"
+                        </v-container>
+                        <v-col
+                            cols="auto"
+                            sm="10"
+                        >
+                            <v-text-field
+                                :rules="date_rules"
+                                v-model="Torg_date"
+                                label="Дата торгов"
+                                class="mx4"
                             >
 
-                                <v-text-field
-                                    :rules="sale_rules"
-                                    v-model="Num_contr"
-                                    label="Кол-во продаж"
-                                    class="mx4">
-                                </v-text-field>
-                            </v-col>
-                            <v-card-actions>
+                            </v-text-field>
+                        </v-col>
+                        <v-col
+                            cols="auto"
+                            sm="10"
+                        >
+                            <v-text-field
+                                :rules="price_rules"
+                                v-model="Quotation"
+                                label="Максимальная цена"
+                                class="mx4">
 
-                                <v-btn
-                                    color="primary"
-                                    text
-                                    @click="AddData_()"
-                                >
-                                    Добавить
-                                </v-btn>
-                                <v-btn
-                                    color="primary"
-                                    text
-                                    @click="CloseAddData_"
-                                >
-                                    Отмена
-                                </v-btn>
-                            </v-card-actions>
-                        </v-form>
+                            </v-text-field>
+                        </v-col>
+                        <v-col
+                            cols="auto"
+                            sm="10"
+                        >
+
+                            <v-text-field
+                                :rules="sale_rules"
+                                v-model="Num_contr"
+                                label="Кол-во продаж"
+                                class="mx4">
+                            </v-text-field>
+                        </v-col>
+                        <v-card-actions>
+
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="AddData_()"
+                            >
+                                Добавить
+                            </v-btn>
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="CloseAddData_"
+                            >
+                                Отмена
+                            </v-btn>
+                        </v-card-actions>
+                    </v-form>
 
                 </v-card>
             </v-dialog>
@@ -474,38 +480,38 @@
                                 sm="50"
                                 md="20"
                             >
-                                    Вы хотите добавить этот фьючерс?
+                                Вы хотите добавить этот фьючерс?
                             </v-col>
-                        <v-col>
-                            <v-col
-                                cols="auto"
-                                sm="50"
-                                md="10"
-                            >
-                                <v-text-field
-                                    v-model="Kod"
-                                    label="Код"
-                                    class="mx4"
+                            <v-col>
+                                <v-col
+                                    cols="auto"
+                                    sm="50"
+                                    md="10"
                                 >
-                                </v-text-field>
+                                    <v-text-field
+                                        v-model="Kod"
+                                        label="Код"
+                                        class="mx4"
+                                    >
+                                    </v-text-field>
+                                </v-col>
+                                <v-btn
+                                    color="primary"
+                                    text
+                                    @click="AddDataF()"
+                                >
+                                    Добавить
+                                </v-btn>
+                                <v-btn
+                                    color="primary"
+                                    text
+                                    @click="dialog_add_f = false"
+                                >
+                                    Отмена
+                                </v-btn>
                             </v-col>
-                                        <v-btn
-                                            color="primary"
-                                            text
-                                            @click="AddDataF()"
-                                        >
-                                            Добавить
-                                        </v-btn>
-                                        <v-btn
-                                            color="primary"
-                                            text
-                                            @click="dialog_add_f = false"
-                                        >
-                                            Отмена
-                                        </v-btn>
-                                    </v-col>
-                                </v-row>
-                            </v-col>
+                            </v-row>
+                        </v-col>
 
                         </v-col>
 
@@ -532,6 +538,7 @@
                             :headers="headersStats"
                             :items="Stats"
                             class="elevation-1"
+
                             :search="search">
                             <template v-slot:top>
                                 <br>
@@ -556,26 +563,15 @@
                                     <td>@{{i.item.V}}</td>
                                     <td :class="{
                       'green lighten-2': i.item.TrendMx > 0,
-                      'red lighten-4': i.item.TrendMx < 0
+                      'red lighten-4': i.item.TrendMx <= 0
                       }">               @{{i.item.TrendMx}}</td>
                                     <td :class="{
                       'green lighten-2': i.item.TrendD > 0,
-                      'red lighten-4': i.item.TrendD < 0
+                      'red lighten-4': i.item.TrendD <= 0
                       }">               @{{i.item.TrendD}}</td>
                                 </tr>
                             </template>
                         </v-data-table>
-
-
-
-
-                        <v-btn
-                            color="primary"
-                            text
-                            @click="showStatsFun()"
-                        >
-                            Рассчитать
-                        </v-btn>
 
 
                         <v-btn
@@ -583,7 +579,7 @@
                             text
                             @click="showStats = false"
                         >
-                            Отмена
+                            Выход
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -601,8 +597,20 @@
             vuetify: new Vuetify(),
             data(){
                 return{
+                    kod_rules_filter:[
+                        v => (!v || /(FUSD[_](0[0-9]|1[0-2])[_]\d{2}$)/.test(v)) || 'Future must be valid',
+                    ],
+                    date_rules_filter:[
+                        v => (!v || /^\d{4}[-](0[1-9]|1[0-2])[-](0[1-9]|[12][0-9]|3[01])$/.test(v)) || 'Date must be valid',
+                    ],
+                    price_rules_filter:[
+                        v => (!v || Number(v)) || 'Price must be numeric',
+                    ],
+                    sale_rules_filter:[
+                        v => (!v || Number(v)) || 'Sale must be integer',
+                    ],
                     kod_rules:[
-                        v => /FUSD[_](0[1-9]|1[0-2])[_]\d{2}$/.test(v) || 'Future must be valid',
+                        v => /(FUSD[_](0[0-9]|1[0-2])[_]\d{2}$)/.test(v) || 'Future must be valid',
                     ],
                     date_rules:[
                         v => /^\d{4}[-](0[1-9]|1[0-2])[-](0[1-9]|[12][0-9]|3[01])$/.test(v) || 'Date must be valid',
@@ -611,7 +619,7 @@
                         v => Number(v) || 'Price must be numeric',
                     ],
                     sale_rules:[
-                        v => Number.isInteger(v) || 'Sale must be integer',
+                        v => Number(v) || 'Sale must be integer',
                     ],
                     <!--NEW CODE-->
                     kod_fut:'',
@@ -622,8 +630,6 @@
                     price_max:'',
                     numb_sales_max:'',
                     <!--NEW CODE-->
-
-
                     //selected:[],
                     //show_tables_info_:[],
                     answer:[],
@@ -717,8 +723,8 @@
                 },
                 <!--NEW CODE-->
                 ShowFilteredTable(){
-                    this.show_tables_info = this.show_tables_info_original
                     if(this.$refs.form1.validate()){
+                        this.show_tables_info = this.show_tables_info_original
                         if (this.kod_fut){
                             this.show_tables_info = this.show_tables_info.filter(data => data.kod == this.kod_fut)
                         }
@@ -742,163 +748,141 @@
                         }
                     }
                 },
-
                 ResetTable(){
                     this.$refs.form1.reset()
                     this.show_tables_info = this.show_tables_info_original
                 },
                 <!--NEW CODE-->
-
                 //<!--NEW CODE-->
                 showStatsFun(){
-                    this.Stats = []
-                    let groupBy = function(xs, key) {
-                        return xs.reduce(function(rv, x) {
-                            (rv[x[key]] = rv[x[key]] || []).push(x);
-                            return rv;
-                        }, {});
-                    };
-
-
-
-                    let t = this.show_tables_info
-                    let t_0 = this.show_tables_info.slice(0, -2)
-
-                    let groupByFUSD_t = groupBy(t, 'kod')
-                    let groupByFUSD_t_0 = groupBy(t_0, 'kod')
-
-
-                    //Нахождение среднего для двух периодов, max, min
-                    let temp_average_t = [];
-
-                    //let temp_min_t = [];
-                    //let temp_max_t = [];
-                    let temp_d_t = [];
-                    let temp_diff_t = [];
-
-
-                    let temp_average_t_0 = [];
-                    let temp_diff_t_0 = [];
-                    //let temp_min_t_t_0 = [];
-                    //let temp_max_t_t_0 = [];
-                    let temp_FUSD = [];
-
-                    let temp_average_all = [];
-                    let temp_diff_all = [];
-
-                    let d;
-
-                    //Тут можно много чего оптимизировать
-                    for (let key in groupByFUSD_t) {
-                        //console.log(key, groupByFUSD_t[key]);
-                        let average = groupByFUSD_t[key].reduce((total, next) => total + parseFloat(next.Xk), 0) / groupByFUSD_t[key].length;
-
-                        let diff = groupByFUSD_t[key].reduce((total, next) => total + (parseFloat(next.Xk) - average)*(parseFloat(next.Xk) - average), 0) / (groupByFUSD_t[key].length-1);
-
-
-                        //Получение минимума для данного фьючерса
-                        /*console.log('min',groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.quotation < curr.quotation ? prev : curr;
-                        }).quotation)*/
-                        /*temp_min_t.push(groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.quotation < curr.quotation ? prev : curr;
-                        }).quotation);*/
-
-                        //Получение максимума для данного фьючерса
-                        /*console.log('max',groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.quotation < curr.quotation ? curr : prev;
-                        }).quotation)*/
-                        /*temp_max_t.push(groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.quotation < curr.quotation ? curr : prev;
-                        }).quotation)*/
-
-                        //Расчёт размаха max - min
-                        d = parseFloat(groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.Xk < curr.Xk ? curr : prev;
-                        }).Xk) - parseFloat(groupByFUSD_t[key].reduce(function(prev, curr) {
-                            return prev.Xk < curr.Xk ? prev : curr;
-                        }).Xk)
-
-                        //console.log('d',d)
-                        //Добавление размаха
-                        temp_d_t.push(d)
-
-                        temp_diff_t.push(diff)
-
-                        //Внесение среднего в массив
-                        temp_average_t.push(average)
-                        //console.log('average', average)
-                        //console.log('diff', diff)
+                    if(this.$refs.form4.validate()){
+                        this.filterTable();
+                        this.showStats =true;
+                        this.Stats = [];
+                        let groupBy = function(xs, key) {
+                            return xs.reduce(function(rv, x) {
+                                (rv[x[key]] = rv[x[key]] || []).push(x);
+                                return rv;
+                            }, {});
+                        };
+                        let t = this.show_tables_info_filter
+                        let t_0 = this.show_tables_info_filter.slice(0, -2)
+                        let groupByFUSD_t = groupBy(t, 'kod')
+                        let groupByFUSD_t_0 = groupBy(t_0, 'kod')
+                        //Нахождение среднего для двух периодов, max, min
+                        let temp_average_t = [];
+                        //let temp_min_t = [];
+                        //let temp_max_t = [];
+                        let temp_d_t = [];
+                        let temp_diff_t = [];
+                        let temp_average_t_0 = [];
+                        let temp_diff_t_0 = [];
+                        //let temp_min_t_t_0 = [];
+                        //let temp_max_t_t_0 = [];
+                        let temp_FUSD = [];
+                        let temp_average_all = [];
+                        let temp_diff_all = [];
+                        let d;
+                        //Тут можно много чего оптимизировать
+                        for (let key in groupByFUSD_t) {
+                            //console.log(key, groupByFUSD_t[key]);
+                            let average = groupByFUSD_t[key].reduce((total, next) => total + parseFloat(next.Xk), 0) / groupByFUSD_t[key].length;
+                            let diff = groupByFUSD_t[key].reduce((total, next) => total + (parseFloat(next.Xk) - average)*(parseFloat(next.Xk) - average), 0) / (groupByFUSD_t[key].length-1);
+                            //Получение минимума для данного фьючерса
+                            /*console.log('min',groupByFUSD_t[key].reduce(function(prev, curr) {
+                                return prev.quotation < curr.quotation ? prev : curr;
+                            }).quotation)*/
+                            /*temp_min_t.push(groupByFUSD_t[key].reduce(function(prev, curr) {
+                                return prev.quotation < curr.quotation ? prev : curr;
+                            }).quotation);*/
+                            //Получение максимума для данного фьючерса
+                            /*console.log('max',groupByFUSD_t[key].reduce(function(prev, curr) {
+                                return prev.quotation < curr.quotation ? curr : prev;
+                            }).quotation)*/
+                            /*temp_max_t.push(groupByFUSD_t[key].reduce(function(prev, curr) {
+                                return prev.quotation < curr.quotation ? curr : prev;
+                            }).quotation)*/
+                            //Расчёт размаха max - min
+                            d = parseFloat(groupByFUSD_t[key].reduce(function(prev, curr) {
+                                return prev.Xk < curr.Xk ? curr : prev;
+                            }).Xk) - parseFloat(groupByFUSD_t[key].reduce(function(prev, curr) {
+                                return prev.Xk < curr.Xk ? prev : curr;
+                            }).Xk)
+                            //console.log('d',d)
+                            //Добавление размаха
+                            temp_d_t.push(d)
+                            temp_diff_t.push(diff)
+                            //Внесение среднего в массив
+                            temp_average_t.push(average)
+                            //console.log('average', average)
+                            //console.log('diff', diff)
+                        }
+                        for (let key in groupByFUSD_t_0) {
+                            //console.log(key, groupByFUSD_t_0[key]);
+                            //console.log(key, groupByFUSD_t_0[key]);
+                            temp_FUSD.push(key)
+                            let average = groupByFUSD_t_0[key].reduce((total, next) => total + parseFloat(next.Xk), 0) / groupByFUSD_t_0[key].length;
+                            let diff = groupByFUSD_t_0[key].reduce((total, next) => total + (parseFloat(next.Xk) - average)*(parseFloat(next.Xk) - average), 0) / (groupByFUSD_t_0[key].length-1);
+                            //let sum = (prev, cur) => ({height: prev.height + cur.height});
+                            //let avg = arr.reduce(sum).height / arr.length;
+                            temp_diff_t_0.push(diff)
+                            temp_average_t_0.push(average)
+                            //console.log('average', average)
+                            //console.log('diff', diff)
+                            //console.log('average', average);
+                        }
+                        for (let i = 0; i < temp_FUSD.length; i++) {
+                            //console.log(temp_FUSD[i]);
+                            //console.log("d",temp_d_t[i]);
+                            //temp_average_all.push(temp_average_t[i] - temp_average_t_0[i])
+                            //temp_diff_all.push(temp_diff_t[i] - temp_diff_t_0[i])
+                            //console.log("temp_average_all",temp_average_t[i] - temp_average_t_0[i])
+                            //console.log("temp_diff_all",temp_diff_t[i] - temp_diff_t_0[i])
+                            let props = [
+                                ['FUSD', temp_FUSD[i]],
+                                ['Mx', Number(temp_average_t[i]).toFixed(6)],
+                                ['D', Number(temp_diff_t[i]).toFixed(6)],
+                                ['V', Number(temp_d_t[i]).toFixed(6)],
+                                ['TrendMx', Number(temp_average_t[i] - temp_average_t_0[i]).toFixed(6)],
+                                ['TrendD', Number(temp_diff_t[i] - temp_diff_t_0[i]).toFixed(6)],
+                            ]
+                            //this.Stats_original.push(Object.fromEntries(props))
+                            this.Stats.push(Object.fromEntries(props))
+                        }
+                        /*
+                        Mx:[],
+                        D:[],
+                        v:[],
+                        TrendMx:[],
+                        TrendD:[],
+                        */
+                        //console.log(temp_average_t)
+                        //console.log(temp_average_t_0)
+                        //const average = t.reduce((a, b) => a + b, 0) / t.length;
                     }
-
-                    for (let key in groupByFUSD_t_0) {
-                        //console.log(key, groupByFUSD_t_0[key]);
-                        //console.log(key, groupByFUSD_t_0[key]);
-                        temp_FUSD.push(key)
-                        let average = groupByFUSD_t_0[key].reduce((total, next) => total + parseFloat(next.Xk), 0) / groupByFUSD_t_0[key].length;
-                        let diff = groupByFUSD_t_0[key].reduce((total, next) => total + (parseFloat(next.Xk) - average)*(parseFloat(next.Xk) - average), 0) / (groupByFUSD_t_0[key].length-1);
-
-                        //let sum = (prev, cur) => ({height: prev.height + cur.height});
-                        //let avg = arr.reduce(sum).height / arr.length;
-
-                        temp_diff_t_0.push(diff)
-                        temp_average_t_0.push(average)
-
-                        //console.log('average', average)
-                        //console.log('diff', diff)
-
-                        //console.log('average', average);
-                    }
-
-                    for (let i = 0; i < temp_FUSD.length; i++) {
-
-                        //console.log(temp_FUSD[i]);
-                        //console.log("d",temp_d_t[i]);
-                        //temp_average_all.push(temp_average_t[i] - temp_average_t_0[i])
-                        //temp_diff_all.push(temp_diff_t[i] - temp_diff_t_0[i])
-                        //console.log("temp_average_all",temp_average_t[i] - temp_average_t_0[i])
-                        //console.log("temp_diff_all",temp_diff_t[i] - temp_diff_t_0[i])
-                        let props = [
-                            ['FUSD', temp_FUSD[i]],
-                            ['Mx', Number(temp_average_t[i]).toFixed(6)],
-                            ['D', Number(temp_diff_t[i]).toFixed(6)],
-                            ['V', Number(temp_d_t[i]).toFixed(6)],
-                            ['TrendMx', Number(temp_average_t[i] - temp_average_t_0[i]).toFixed(6)],
-                            ['TrendD', Number(temp_diff_t[i] - temp_diff_t_0[i]).toFixed(6)],
-                        ]
-
-                        this.Stats.push(Object.fromEntries(props))
-                    }
-
-                    /*
-                    Mx:[],
-                    D:[],
-                    v:[],
-                    TrendMx:[],
-                    TrendD:[],
-                    */
-
-                    //console.log(temp_average_t)
-                    //console.log(temp_average_t_0)
-
-                    //const average = t.reduce((a, b) => a + b, 0) / t.length;
                 },
                 filterTable(){
-                    this.show_tables_info = this.show_tables_info_original
+                    this.show_tables_info_filter = this.show_tables_info_original
                     if (this.Date_1 != '' && this.Date_2 != ''){
-                        temp = this.show_tables_info.filter(dates => dates.torg_date >= this.Date_1 && dates.torg_date <= this.Date_2);
-                        this.show_tables_info = temp
+                        temp = this.show_tables_info_original.filter(dates => dates.torg_date >= this.Date_1 && dates.torg_date <= this.Date_2);
+                        this.show_tables_info_filter = temp
                     }
-
-
                     //this.users = temp
-
+                    //console.log(temp)
+                },
+                filterTable(){
+                    this.show_tables_info_filter = this.show_tables_info_original
+                    if (this.Date_1 != '' && this.Date_2 != ''){
+                        temp = this.show_tables_info_original.filter(dates => dates.torg_date >= this.Date_1 && dates.torg_date <= this.Date_2);
+                        this.show_tables_info_filter = temp
+                    }
+                    //this.users = temp
                     //console.log(temp)
                 },
                 //<!--NEW CODE-->
-                 async ShowUnitedTable(){//Запрос на данные из таблиц
+                async ShowUnitedTable(){//Запрос на данные из таблиц
                     this.show_tables_info_ = []
-                     await fetch('ShowUnitedTable',{
+                    await fetch('ShowUnitedTable',{
                         method: 'GET',
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
                     })
@@ -911,9 +895,9 @@
                         })
                 },
                 ShowDialogAdd(){/*Диалог на добаление*/
-                    this.Kod='FUSD_'
+                    this.Kod=''
                     this.Exec_data=''
-                    this.Torg_date='199'
+                    this.Torg_date=''
                     this.Quotation=''
                     this.Num_contr=''
                     this.dialog_add=true
@@ -982,7 +966,6 @@
                             })
                         if (this.answer!=0)
                         {
-                            console.log('Ответ:',this.answer)
                             this.AddData()
                         }
                         else
@@ -1024,10 +1007,8 @@
                     this.dialog_add_f=false;
                 },
             },
-
             mounted: function (){//предзапуск функций
                 this.ShowUnitedTable();
-
             }
         })
     </script>

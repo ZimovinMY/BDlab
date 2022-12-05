@@ -167,18 +167,68 @@ class MainController extends Controller
                 'Xk' => $data_item->Xk
             );
         }
-        $this->ExportFunction($data_array,$filter_array);
+        date_default_timezone_set('Europe/Moscow');
+        $date_ = date('m/d/Y h:i:s a', time());
+        $date_array [] = array("Дата формирования файла");
+        $date_array [] = array(
+            'Дата формирования файла' => $date_);
+        $this->ExportFunction($data_array,$filter_array,$date_array);
     }
 
-    public function ExportFunction($export_array,$export_filter){
+    public function ExportFunction($export_array,$export_filter,$date_array){
         $spreadSheet = new Spreadsheet();
-        $spreadSheet->createSheet();
-        $spreadSheet->setActiveSheetIndex(0)->setTitle('Фильтры')->getDefaultColumnDimension()->setWidth(25);
-        $spreadSheet->setActiveSheetIndex(0)->fromArray($export_filter);
-        $spreadSheet->setActiveSheetIndex(1)->setTitle('Данные')->getDefaultColumnDimension()->setWidth(20);
-        $spreadSheet->setActiveSheetIndex(1)->fromArray($export_array);
+        $spreadSheet->getActiveSheet()->getStyle('A1:H2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $spreadSheet->getActiveSheet()->getStyle('A1:H2')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $borderStyleArray = array(
+            'borders' => array(
+                'outline' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('rgb' => '000000'),
+                ),
+                'horizontal' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('rgb' => '000000'),
+                ),
+                'vertical' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('rgb' => '000000'),
+                ),
+            ),
+        );
+        $spreadSheet->getActiveSheet()->getStyle('A1:H2')->applyFromArray($borderStyleArray);
+        $spreadSheet->getActiveSheet()->getStyle('A1:H1')
+            ->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB('FFFF9000');
+        $spreadSheet->getActiveSheet()->getStyle('A1:H1')->getFont()->setBold(true);
+        $spreadSheet->getActiveSheet()->getStyle('A1:H1')->getAlignment()->setWrapText(true);
+        $spreadSheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(14);
+        $spreadSheet->getActiveSheet()->getColumnDimension('A')->setWidth(21);
+        $spreadSheet->getActiveSheet()->getRowDimension('1')->setRowHeight(30);
+        $spreadSheet->getActiveSheet()->fromArray($date_array,NULL,'A1');
+        $spreadSheet->getActiveSheet()->fromArray($export_filter,NULL,'B1');
+        $spreadSheet->getActiveSheet()->fromArray($export_array,NULL,'J1');
+        $highestRow = $spreadSheet->getActiveSheet()->getHighestDataRow();
+        $spreadSheet->getActiveSheet()->getStyle('J1:O'.$highestRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $spreadSheet->getActiveSheet()->getStyle('J1:O'.$highestRow)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $spreadSheet->getActiveSheet()->getStyle('J1:O'.$highestRow)->applyFromArray($borderStyleArray);
+        $spreadSheet->getActiveSheet()->getStyle('J1:O1')
+            ->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB('FFFF9000');
+        $spreadSheet->getActiveSheet()->getStyle('J1:O1')->getFont()->setBold(true);
+        $spreadSheet->getActiveSheet()->getStyle('J1:O1')->getAlignment()->setWrapText(true);
         $Excel_writer = new Xls($spreadSheet);
         $Excel_writer->save('ExportedData.xls');
+        //$spreadSheet->createSheet();
+        //$spreadSheet->setActiveSheetIndex(0)->setTitle('Фильтры')->getDefaultColumnDimension()->setWidth(25);
+        //$spreadSheet->setActiveSheetIndex(0)->fromArray($export_filter);
+        //$spreadSheet->setActiveSheetIndex(1)->setTitle('Данные')->getDefaultColumnDimension()->setWidth(20);
+        //$spreadSheet->setActiveSheetIndex(1)->fromArray($export_array);
+        //$Excel_writer = new Xls($spreadSheet);
+        //$Excel_writer->save('ExportedData.xls');
     }
 
     public function GetDownload()
@@ -224,16 +274,59 @@ class MainController extends Controller
                 'TrendD' => $explode_TrendD[$i]
             );
         }
-        $this->ExportFunctionStats($data_array,$filter_array);
+        date_default_timezone_set('Europe/Moscow');
+        $date_ = date('m/d/Y h:i:s a', time());
+        $date_array [] = array("Дата формирования файла");
+        $date_array [] = array(
+            'Дата формирования файла' => $date_);
+        $this->ExportFunctionStats($data_array,$filter_array,$date_array);
     }
 
-    public function ExportFunctionStats($export_array,$export_filter){
+    public function ExportFunctionStats($export_array,$export_filter,$date_array){
         $spreadSheet = new Spreadsheet();
-        $spreadSheet->createSheet();
-        $spreadSheet->setActiveSheetIndex(0)->setTitle('Фильтры')->getDefaultColumnDimension()->setWidth(15);
-        $spreadSheet->setActiveSheetIndex(0)->fromArray($export_filter);
-        $spreadSheet->setActiveSheetIndex(1)->setTitle('Данные')->getDefaultColumnDimension()->setWidth(11);
-        $spreadSheet->setActiveSheetIndex(1)->fromArray($export_array);
+        $spreadSheet->getActiveSheet()->getStyle('A1:C2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $spreadSheet->getActiveSheet()->getStyle('A1:C2')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $borderStyleArray = array(
+            'borders' => array(
+                'outline' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('rgb' => '000000'),
+                ),
+                'horizontal' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('rgb' => '000000'),
+                ),
+                'vertical' => array(
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => array('rgb' => '000000'),
+                ),
+            ),
+        );
+        $spreadSheet->getActiveSheet()->getStyle('A1:C2')->applyFromArray($borderStyleArray);
+        $spreadSheet->getActiveSheet()->getStyle('A1:C1')
+            ->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB('FFFF9000');
+        $spreadSheet->getActiveSheet()->getStyle('A1:C1')->getFont()->setBold(true);
+        $spreadSheet->getActiveSheet()->getStyle('A1:C1')->getAlignment()->setWrapText(true);
+        $spreadSheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(14);
+        $spreadSheet->getActiveSheet()->getColumnDimension('A')->setWidth(21);
+        $spreadSheet->getActiveSheet()->getRowDimension('1')->setRowHeight(30);
+        $spreadSheet->getActiveSheet()->fromArray($date_array,NULL,'A1');
+        $spreadSheet->getActiveSheet()->fromArray($export_filter,NULL,'B1');
+        $spreadSheet->getActiveSheet()->fromArray($export_array,NULL,'E1');
+        $highestRow = $spreadSheet->getActiveSheet()->getHighestDataRow();
+        $spreadSheet->getActiveSheet()->getStyle('E1:J'.$highestRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $spreadSheet->getActiveSheet()->getStyle('E1:J'.$highestRow)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $spreadSheet->getActiveSheet()->getStyle('E1:J'.$highestRow)->applyFromArray($borderStyleArray);
+        $spreadSheet->getActiveSheet()->getStyle('E1:J1')
+            ->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()
+            ->setARGB('FFFF9000');
+        $spreadSheet->getActiveSheet()->getStyle('E1:J1')->getFont()->setBold(true);
+        $spreadSheet->getActiveSheet()->getStyle('E1:J1')->getAlignment()->setWrapText(true);
         $Excel_writer = new Xls($spreadSheet);
         $Excel_writer->save('ExportedDataStats.xls');
     }

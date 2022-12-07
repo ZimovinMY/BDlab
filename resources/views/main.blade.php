@@ -952,7 +952,7 @@
                 AddData_(){//добавление данных проверка кода
                     if(this.$refs.form3.validate()){
                         let data=new FormData()
-                        data.append('kod',this.Kod1+this.Kod)
+                        data.append('kod',this.Kod)
                         fetch('KodCheck',{
                             method:'post',
                             headers:{'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
